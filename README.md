@@ -3,6 +3,5 @@
 ## Run
 
 ```
-npm run build
 nom run start
 ```

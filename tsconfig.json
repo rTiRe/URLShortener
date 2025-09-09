@@ -12,7 +12,8 @@
         "baseUrl": "src",
         "moduleResolution": "node",
         "emitDecoratorMetadata": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "sourceMap": true
     },
     "exclude": [
         "node_modules"

@@ -6,8 +6,8 @@ class App {
   private _app: Application
 
   constructor(
-    host: string = '127.0.0.1',
-    port: number = 3000
+    host: string = process.env.APP_HOST || '0.0.0.0',
+    port: number = Number(process.env.APP_PORT) || 5000,
   ) {
     this._host = host
     this._port = port
