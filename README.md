@@ -3,5 +3,8 @@
 ## Run
 
 ```
-nom run start
+npm run start
 ```
+
+> [!NOTE]
+> ESLint runs on start
