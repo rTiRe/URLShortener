@@ -1,13 +1,16 @@
 import express, { Application } from 'express'
 
+import logger from './logger'
+import env from './config'
+
 class App {
   protected _host: string
   protected _port: number
   private _app: Application
 
   constructor(
-    host: string = process.env.APP_HOST || '0.0.0.0',
-    port: number = Number(process.env.APP_PORT) || 5000,
+    host: string = env.APP_HOST || '0.0.0.0',
+    port: number = Number(env.APP_PORT) || 5000,
   ) {
     this._host = host
     this._port = port
@@ -28,8 +31,8 @@ class App {
   }
 
   run() {
-    this._app.listen(this._port, this.host, () =>{
-      console.log(`App running on ${this._host}:${this._port}`)
+    this._app.listen(this._port, this.host, () => {
+      logger.info(`App running on ${this._host}:${this._port}`)
     })
   }
 }
