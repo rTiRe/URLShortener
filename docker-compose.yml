@@ -1,0 +1,10 @@
+services:
+  api:
+    build:
+      context: ./app
+    volumes:
+      - ./app:/app
+      - /app/node_modules
+    ports:
+      - 4000:3000
+    # command: npm run dev

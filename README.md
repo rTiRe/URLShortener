@@ -35,7 +35,14 @@
 ## Run
 
 ```
+cd app
 npm run start
+```
+
+or
+
+```
+docker compose up
 ```
 
 > [!NOTE]
