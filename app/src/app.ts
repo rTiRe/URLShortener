@@ -1,7 +1,7 @@
 import express, { Application } from 'express'
 
 import logger from './logger'
-import env from './config'
+import config from './config'
 
 class App {
   protected _host: string
@@ -9,8 +9,8 @@ class App {
   private _app: Application
 
   constructor(
-    host: string = env.APP_HOST || '0.0.0.0',
-    port: number = Number(env.APP_PORT) || 5000,
+    host: string = config.APP_HOST,
+    port: number = config.APP_PORT,
   ) {
     this._host = host
     this._port = port
