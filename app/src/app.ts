@@ -20,15 +20,15 @@ class App {
     this._app.use('/api', apiRouter)
   }
 
-  get instance() {
+  get instance(): Application {
     return this._app
   }
 
-  get host() {
+  get host(): string {
     return this._host
   }
 
-  get port() {
+  get port(): number {
     return this._port
   }
 
