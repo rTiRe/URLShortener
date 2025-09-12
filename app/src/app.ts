@@ -2,6 +2,7 @@ import express, { Application } from 'express'
 
 import logger from './logger'
 import config from './config'
+import apiRouter from './api'
 
 class App {
   protected _host: string
@@ -16,6 +17,7 @@ class App {
     this._port = port
     this._app = express()
     this._app.use(express.json())
+    this._app.use('/api', apiRouter)
   }
 
   get instance() {
