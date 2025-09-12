@@ -1,11 +1,19 @@
 # URL Shortening Service
 
+## Utils
+
+* `Docker`
+* `Docker Compose`
+* `golang-migrate/migrate`
+* `PostgreSQL`
+
 ## Libraries
 
 * `express.js`
 * `log4js`
 * `dotenv`
 * `sqids`
+* `typescript`
 
 ## Database
 
@@ -17,8 +25,8 @@
 |-------------|---------------|-------------------------------|-------------------------------|--------------------------------|
 | **id** | TIMESTAMP | 🔑 PK, not null |  | |
 | **node** | SMALLINT | 🔑 PK, not null |  | |
-| **short** | VARCHAR(32) | not null, unique |  | |
-| **full** | TEXT | not null |  | | 
+| **short_code** | VARCHAR(32) | not null, unique |  | |
+| **original_url** | TEXT | not null |  | | 
 
 #### Indexes
 | Name | Unique | Fields |

@@ -1,0 +1,1 @@
+drop index if exists "idx_urls_id_and_node";

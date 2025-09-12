@@ -1,0 +1,1 @@
+create index if not exists "idx_urls_id_and_node" on "shortener"."urls" using btree (id, node);

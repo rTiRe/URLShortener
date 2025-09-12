@@ -1,0 +1,1 @@
+alter table "shortener"."urls" drop constraint if exists urls_pkey;
