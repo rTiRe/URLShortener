@@ -1,5 +1,7 @@
 # URL Shortening Service
 
+App for shortinize urls
+
 ## Utils
 
 * `Docker`
