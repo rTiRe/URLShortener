@@ -3,6 +3,7 @@ import express, { Application } from 'express'
 import logger from './logger'
 import config from './config'
 import apiRouter from './api'
+import PostgresStorage from './storages/PostgresStorage'
 
 class App {
   protected _host: string
@@ -32,8 +33,16 @@ class App {
     return this._port
   }
 
+  private async stop_listener() {
+    await PostgresStorage.disconnect()
+    logger.info('App stopped')
+  }
+
   run() {
-    this._app.listen(this._port, this.host, () => {
+    process.once('SIGINT', this.stop_listener)
+    process.once('SIGTERM', this.stop_listener)
+    this._app.listen(this._port, this.host, async () => {
+      await PostgresStorage.connect()
       logger.info(`App running on ${this._host}:${this._port}`)
     })
   }

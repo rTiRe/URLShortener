@@ -14,4 +14,12 @@ export default class Config {
   static get LOG_LEVEL(): string {
     return process.env.LOG_LEVEL || 'error'
   }
+
+  static get DB_URL(): string {
+    const dbUrl = process.env.DB_URL
+    if (!dbUrl) {
+      throw new Error('DB_URL is not set in environment variables')
+    }
+    return dbUrl
+  }
 }

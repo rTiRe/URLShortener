@@ -14,11 +14,13 @@
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "log4js": "^6.9.1",
+    "pg": "^8.16.3",
     "sqids": "^0.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
     "@types/node": "^24.3.1",
+    "@types/pg": "^8.15.5",
     "eslint": "^9.35.0",
     "globals": "^16.4.0",
     "jiti": "^2.5.1",
