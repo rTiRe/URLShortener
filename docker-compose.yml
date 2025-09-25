@@ -1,4 +1,103 @@
 services:
+  authentik_postgresql:
+    container_name: authentik_postgresql
+    env_file:
+    - .env
+    environment:
+      POSTGRES_DB: ${PG_DB:-authentik}
+      POSTGRES_PASSWORD: ${PG_PASS:?database password required}
+      POSTGRES_USER: ${PG_USER:-authentik}
+    healthcheck:
+      interval: 30s
+      retries: 5
+      start_period: 20s
+      test:
+      - CMD-SHELL
+      - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
+      timeout: 5s
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+    - authentik_database:/var/lib/postgresql/data
+    networks:
+    - authentik
+
+  authentik_redis:
+    container_name: authentik_redis
+    command: --save 60 1 --loglevel warning
+    healthcheck:
+      interval: 30s
+      retries: 5
+      start_period: 20s
+      test:
+      - CMD-SHELL
+      - redis-cli ping | grep PONG
+      timeout: 3s
+    image: docker.io/library/redis:alpine
+    restart: unless-stopped
+    volumes:
+    - authentik_redis:/data
+    networks:
+    - authentik
+
+  authentik_server:
+    container_name: authentik_server
+    command: server
+    depends_on:
+      authentik_postgresql:
+        condition: service_healthy
+      authentik_redis:
+        condition: service_healthy
+    env_file:
+    - .env
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: authentik_postgresql
+      AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+      AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
+      AUTHENTIK_REDIS__HOST: authentik_redis
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?secret key required}
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.8.1}
+    ports:
+    - ${COMPOSE_PORT_HTTP:-9000}:9000
+    - ${COMPOSE_PORT_HTTPS:-9443}:9443
+    restart: unless-stopped
+    volumes:
+    - ./media:/media
+    - ./custom-templates:/templates
+    networks:
+    - authentik
+    - proxy
+
+  authentik_worker:
+    container_name: authentik_worker
+    command: worker
+    depends_on:
+      authentik_postgresql:
+        condition: service_healthy
+      authentik_redis:
+        condition: service_healthy
+    env_file:
+    - .env
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: authentik_postgresql
+      AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+      AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
+      AUTHENTIK_REDIS__HOST: authentik_redis
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?secret key required}
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.8.1}
+    restart: unless-stopped
+    user: root
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./media:/media
+    - ./certs:/certs
+    - ./custom-templates:/templates
+    networks:
+    - authentik
+    - proxy
+
   database:
     container_name: database
     image: postgres:17.4-alpine3.21
@@ -37,6 +136,7 @@ services:
     ]
 
   api:
+    container_name: api
     build:
       context: ./app
     volumes:
@@ -47,17 +147,43 @@ services:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
-    ports:
-      - 4000:3000
+      authentik_server:
+        condition: service_healthy
+      authentik_worker:
+        condition: service_healthy
+    # ports:
+    #   - 4000:3000
     networks:
       - api_network
       - database_network
+      - proxy
     environment:
       - SLOT=1
+
+  nginx:
+    image: nginx:mainline-alpine3.21
+    restart: unless-stopped
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx:/etc/nginx/
+    depends_on:
+      api:
+        condition: service_started
+      authentik_server:
+        condition: service_healthy
+      authentik_worker:
+        condition: service_healthy
+    networks:
+      - proxy
 
 
 volumes:
   database-data:
+  authentik_database:
+    driver: local
+  authentik_redis:
+    driver: local
 
 
 networks:
@@ -66,4 +192,8 @@ networks:
   database_network:
     driver: bridge
   api_network:
+    driver: bridge
+  authentik:
+    driver: bridge
+  proxy:
     driver: bridge

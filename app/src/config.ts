@@ -22,4 +22,8 @@ export default class Config {
     }
     return dbUrl
   }
+
+  static get SLOT(): number {
+    return Number(process.env.SLOT) || 1
+  }
 }
