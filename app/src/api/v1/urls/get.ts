@@ -31,13 +31,14 @@ const router = Router()
  */
 router.get('/:shortCode', async (request: Request, response: Response) => {
   const queryResult = await postgres.pool.query(
-    'select original_url from shortener.urls where short_code = $1',
+    'select original_url, encode(user_id, \'hex\') user_id from shortener.urls where short_code = $1',
     [
       request.params.shortCode,
     ],
   )
   const originalURL = queryResult.rows[0]?.original_url
-  if (!originalURL) {
+  const userID = queryResult.rows[0]?.user_id
+  if (!originalURL || !userID) {
     response.status(404)
     response.end()
     return
@@ -46,7 +47,11 @@ router.get('/:shortCode', async (request: Request, response: Response) => {
   // после того как Authentik проверил по куки, 
   // что пользователь авторизован
   logger.info(request.headers['x-authentik-uid'])
-  response.json(queryResult.rows[0])
+  logger.info(request.header('x-authentik-uid'))
+  response.json({
+    original_url: originalURL,
+    user_id: userID,
+  })
 })
 
 export default router

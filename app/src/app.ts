@@ -62,6 +62,11 @@ class App {
                   type: 'string',
                   example: 'https://example.com/some/path?query=parameter',
                 },
+                user_id: {
+                  type: 'string',
+                  example: '4b42c4ff9f794a436f2817bb1e51dbf33c97be44dfb17e3bd4b608c9d282e380',
+                  description: 'SHA256 encoded user id'
+                },
               },
             },
           },

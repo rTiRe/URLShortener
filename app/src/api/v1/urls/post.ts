@@ -30,18 +30,28 @@ const router = Router()
  *        description: Unprocessable Entity
  */
 router.post('/', async (request: Request, response: Response): Promise<void> => {
+  // Доверяем, потому что этот header ставит nginx 
+  // после того как Authentik проверил по куки, 
+  // что пользователь авторизован
+  const user_id = request.header('x-authentik-uid')
+  if (!user_id) {
+    response.status(401)
+    response.end()
+    return
+  }
   try {
     const request_body: shortinizeURLRequest = request.body
     const timestamp_milliseconds = Date.now()
     const timestamp_seconds = Math.round(timestamp_milliseconds / 1000)
     const short_code = shortener.encode([timestamp_seconds, config.SLOT])
     await postgres.pool.query(
-      'insert into shortener.urls (id, node, short_code, original_url) values ($1, $2, $3, $4)',
+      'insert into shortener.urls (id, node, short_code, original_url, user_id) values (to_timestamp($1), $2, $3, $4, decode($5, \'hex\'))',
       [
         timestamp_seconds,
         config.SLOT,
         short_code,
         request_body.url,
+        user_id,
       ]
     )
     response.json({
