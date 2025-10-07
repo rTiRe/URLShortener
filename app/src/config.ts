@@ -26,4 +26,24 @@ export default class Config {
   static get SLOT(): number {
     return Number(process.env.SLOT) || 1
   }
+
+  static get AUTHENTIK_EXTERNAL_HOST(): string {
+    return process.env.AUTHENTIK_EXTERNAL_HOST || '127.0.0.1'
+  }
+
+  static get AUTHENTIK_EXTERNAL_PORT(): number {
+    return Number(process.env.AUTHENTIK_EXTERNAL_PORT) || 9000
+  }
+
+  static get AUTHENTIK_EXTERNAL_URL(): string {
+    return `http://${this.AUTHENTIK_EXTERNAL_HOST}:${this.AUTHENTIK_EXTERNAL_PORT}/`
+  }
+
+  static get OAUTH2_CLIENT_ID(): string {
+    return process.env.OAUTH2_CLIENT_ID || ''
+  }
+
+  static get OAUTH2_CLIENT_SECRET(): string {
+    return process.env.OAUTH2_CLIENT_SECRET || ''
+  }
 }

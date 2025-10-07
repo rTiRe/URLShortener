@@ -1,0 +1,94 @@
+openapi: 3.0.4
+info:
+  title: Swagger Petstore - OpenAPI 3.0
+  version: 0.0.1
+servers:
+  - url: http://127.0.0.1/api/v1
+tags:
+  - name: URLs
+    description: Operations about url
+paths:
+  /urls:
+    post:
+      tags:
+        - URLs
+      summary: Shortinize URL
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShortinizeURLRequest'
+      responses:
+        '200':
+          description: Successfull response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShortinizeURLResponse'
+        '422':
+          description: Unprocessable Entity
+  /urls/{short_code}:
+    get:
+      tags:
+        - URLs
+      summary: Get full URL by short code.
+      parameters:
+        - name: short_code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfull response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OriginalURL'
+        '404':
+          description: URL not found
+components:
+  schemas:
+    ShortinizeURLRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          example: https://example.com/some/path?query=parameter
+    ShortinizeURLResponse:
+      type: object
+      properties:
+        short_code:
+          type: string
+          example: aB_1!
+    OriginalURL:
+      type: object
+      properties:
+        original_url:
+          type: string
+          example: https://example.com/some/path?query=parameter
+  requestBodies:
+    UserArray:
+      description: List of user object
+      content:
+        application/json:
+          schema:
+            type: array
+            # items:
+              # $ref: '#/components/schemas/User'
+  # securitySchemes:
+  #   petstore_auth:
+  #     type: oauth2
+  #     flows:
+  #       implicit:
+  #         authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+  #         scopes:
+  #           "write:pets": modify pets in your account
+  #           "read:pets": read your pets
+  #   api_key:
+  #     type: apiKey
+  #     name: api_key
+  #     in: header
+      
+      
+      

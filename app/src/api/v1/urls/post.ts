@@ -6,6 +6,29 @@ import config from '../../../config'
 
 const router = Router()
 
+
+/**
+ * @openapi
+ * /urls:
+ *   post:
+ *    tags:
+ *      - URLs
+ *    summary: Shortinize URL
+ *    requestBody:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/ShortinizeURLRequest'
+ *    responses:
+ *      '200':
+ *        description: Successfull response
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/ShortinizeURLResponse'
+ *      '422':
+ *        description: Unprocessable Entity
+ */
 router.post('/', async (request: Request, response: Response): Promise<void> => {
   try {
     const request_body: shortinizeURLRequest = request.body

@@ -1,4 +1,6 @@
 import express, { Application } from 'express'
+import swaggerUi from 'swagger-ui-express'
+import swaggerJsdoc from 'swagger-jsdoc'
 
 import logger from './logger'
 import config from './config'
@@ -19,6 +21,56 @@ class App {
     this._app = express()
     this._app.use(express.json())
     this._app.use('/api', apiRouter)
+    const swaggerOptions = {
+      failOnErrors: true,
+      definition: {
+        openapi: '3.1.0',
+        info: {
+          title: 'URL Shortener API',
+          version: '1.0.0',
+        },
+        servers: [
+          {
+            url: 'http://127.0.0.1/api/v1',
+            description: 'Version 1 API',
+          },
+        ],
+        components: {
+          schemas: {
+            ShortinizeURLRequest: {
+              type: 'object',
+              properties: {
+                url: {
+                  type: 'string',
+                  example: 'https://example.com/some/path?query=parameter',
+                },
+              },
+            },
+            ShortinizeURLResponse: {
+              type: 'object',
+              properties: {
+                short_code: {
+                  type: 'string',
+                  example: 'aB_1!',
+                },
+              },
+            },
+            OriginalURL: {
+              type: 'object',
+              properties: {
+                original_url: {
+                  type: 'string',
+                  example: 'https://example.com/some/path?query=parameter',
+                },
+              },
+            },
+          },
+        },
+      },
+      apis: ['**/*.ts'],
+    };
+    // const swaggerDocument = require('./api/swagger.yml');
+    this._app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerJsdoc(swaggerOptions)))
   }
 
   get instance(): Application {

@@ -21,6 +21,8 @@ services:
     - authentik_database:/var/lib/postgresql/data
     networks:
     - authentik
+    ports:
+      - 5432:5432
 
   authentik_redis:
     container_name: authentik_redis
@@ -51,6 +53,7 @@ services:
     env_file:
     - .env
     environment:
+      AUTHENTIK_HOST: "authentik_server:9000,127.0.0.1:9000"
       AUTHENTIK_POSTGRESQL__HOST: authentik_postgresql
       AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
       AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
@@ -141,7 +144,7 @@ services:
       context: ./app
     volumes:
       - ./app:/app
-      - /app/node_modules
+      # - /app/node_modules
     depends_on:
       database:
         condition: service_healthy
@@ -154,6 +157,7 @@ services:
     # ports:
     #   - 4000:3000
     networks:
+      - authentik
       - api_network
       - database_network
       - proxy
